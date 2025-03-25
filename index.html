@@ -1,0 +1,572 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Weather Forecast</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="ri-cloud-line"></i>
+                        <h1>Farm Weather Forecast</h1>
+                    </div>
+                    <nav class="main-nav">
+                        <ul>
+                            <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+                            <li><a href="#" data-page="forecast">Forecast</a></li>
+                            <li><a href="#" data-page="planting">Planting</a></li>
+                            <li><a href="#" data-page="harvesting">Harvesting</a></li>
+                        </ul>
+                    </nav>
+                    <div class="user-controls">
+                        <button class="btn-icon" id="theme-toggle">
+                            <i class="ri-sun-line"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="ri-notification-3-line"></i>
+                        </button>
+                        <div class="user-profile">
+                            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Location Bar -->
+        <div class="location-bar">
+            <div class="container">
+                <div class="location-content">
+                    <div class="current-location">
+                        <i class="ri-map-pin-line"></i>
+                        <span>Iowa, USA</span>
+                    </div>
+                    <div class="last-updated">
+                        Last updated: <span id="update-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Dashboard Page -->
+                <div class="page" id="dashboard-page">
+                    <div class="dashboard-grid">
+                        <!-- Current Weather -->
+                        <div class="card" id="current-weather-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Current Weather</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="weather-main">
+                                    <div class="weather-icon">
+                                        <i class="ri-sun-cloudy-line"></i>
+                                    </div>
+                                    <div class="weather-info">
+                                        <div class="temperature">72°F</div>
+                                        <div class="conditions">Partly Cloudy</div>
+                                    </div>
+                                </div>
+                                <div class="weather-details">
+                                    <div class="weather-detail">
+                                        <span class="detail-label">Humidity</span>
+                                        <span class="detail-value">65%</span>
+                                    </div>
+                                    <div class="weather-detail">
+                                        <span class="detail-label">Wind</span>
+                                        <span class="detail-value">8 mph</span>
+                                    </div>
+                                    <div class="weather-detail">
+                                        <span class="detail-label">Precipitation</span>
+                                        <span class="detail-value">10%</span>
+                                    </div>
+                                    <div class="weather-detail">
+                                        <span class="detail-label">Soil Temp</span>
+                                        <span class="detail-value">65°F</span>
+                                    </div>
+                                </div>
+                                <div class="farming-recommendation">
+                                    <i class="ri-checkbox-circle-line"></i>
+                                    <span>Good conditions for harvesting</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weather Forecast -->
+                        <div class="card" id="weather-forecast-card">
+                            <div class="card-header">
+                                <h2 class="card-title">5-Day Forecast</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="forecast-container" id="forecast-container">
+                                    <!-- Forecast items will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Soil Conditions -->
+                        <div class="card" id="soil-conditions-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Soil Conditions</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="soil-metrics">
+                                    <div class="soil-metric">
+                                        <div class="metric-header">
+                                            <h3>Moisture Level</h3>
+                                            <span class="metric-value">68%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 68%"></div>
+                                        </div>
+                                        <p class="metric-note">Optimal range: 60-75%</p>
+                                    </div>
+                                    <div class="soil-metric">
+                                        <div class="metric-header">
+                                            <h3>pH Level</h3>
+                                            <span class="metric-value">6.5</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 50%"></div>
+                                        </div>
+                                        <p class="metric-note">Optimal range: 6.0-7.0</p>
+                                    </div>
+                                </div>
+                                <div class="soil-temperature">
+                                    <h3>7-Day Soil Temperature Trend</h3>
+                                    <div class="temperature-chart" id="soil-temp-chart">
+                                        <!-- Chart will be rendered here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Farming Activities -->
+                        <div class="card" id="farming-activities-card">
+                            <div class="card-header">
+                                <div class="header-with-action">
+                                    <h2 class="card-title">Farming Activities</h2>
+                                    <button class="btn-text" id="add-activity-btn">
+                                        <i class="ri-add-line"></i> Add Activity
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="activities-list" id="activities-list">
+                                    <!-- Activities will be inserted here -->
+                                </div>
+                                <button class="btn-outline full-width" id="view-all-activities">
+                                    View All Activities
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Weather Map -->
+                        <div class="card" id="weather-map-card">
+                            <div class="card-header">
+                                <div class="header-with-action">
+                                    <h2 class="card-title">Weather Map</h2>
+                                    <div class="map-controls">
+                                        <button class="btn-small active" data-map-type="precipitation">Precipitation</button>
+                                        <button class="btn-small" data-map-type="temperature">Temperature</button>
+                                        <button class="btn-small" data-map-type="wind">Wind</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="map-container" id="weather-map">
+                                    <!-- Map will be rendered here -->
+                                </div>
+                                <div class="map-footer">
+                                    <div class="zoom-level">Zoom: <span>County Level</span></div>
+                                    <button class="btn-text" id="toggle-fullscreen">
+                                        View Fullscreen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Planting Calendar -->
+                        <div class="card" id="planting-calendar-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Planting Calendar</h2>
+                            </div>
+                            <div class="card-content">
+                                <div class="calendar-header">
+                                    <button class="btn-icon" id="prev-month">
+                                        <i class="ri-arrow-left-s-line"></i>
+                                    </button>
+                                    <h3 id="calendar-month">September 2023</h3>
+                                    <button class="btn-icon" id="next-month">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                    </button>
+                                </div>
+                                <div class="calendar-grid" id="calendar-grid">
+                                    <!-- Calendar will be rendered here -->
+                                </div>
+                                <div class="planting-windows">
+                                    <h3>Upcoming Planting Windows</h3>
+                                    <ul class="planting-windows-list" id="planting-windows-list">
+                                        <!-- Planting windows will be inserted here -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forecast Page -->
+                <div class="page hidden" id="forecast-page">
+                    <h2 class="page-title">Detailed Weather Forecast</h2>
+                    
+                    <!-- 10-Day Forecast -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">10-Day Forecast</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="extended-forecast-container" id="extended-forecast-container">
+                                <!-- Extended forecast will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hourly Forecast -->
+                    <div class="card mt-lg">
+                        <div class="card-header">
+                            <h2 class="card-title">Hourly Forecast</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="hourly-forecast-container" id="hourly-forecast-container">
+                                <!-- Hourly forecast will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weather Alerts -->
+                    <div class="card mt-lg">
+                        <div class="card-header">
+                            <h2 class="card-title">Weather Alerts</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="alerts-container" id="alerts-container">
+                                <div class="weather-alert warning">
+                                    <div class="alert-header">
+                                        <div class="alert-type">
+                                            <i class="ri-alert-line"></i>
+                                            <span>Wind Advisory</span>
+                                        </div>
+                                        <div class="alert-time">Until 8:00 PM</div>
+                                    </div>
+                                    <div class="alert-content">
+                                        <p>Winds from southwest 20 to 30 mph with gusts to 45 mph expected. Secure loose objects and use caution when driving high-profile vehicles.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Planting Page -->
+                <div class="page hidden" id="planting-page">
+                    <h2 class="page-title">Planting Guide</h2>
+                    
+                    <!-- Planting Calendar -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Planting Calendar</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="full-calendar-container" id="full-calendar-container">
+                                <!-- Full calendar will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Crop Planting Guide -->
+                    <div class="card mt-lg">
+                        <div class="card-header">
+                            <h2 class="card-title">Crop Planting Guide</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="crop-guide-container">
+                                <div class="crop-guide-tabs">
+                                    <button class="crop-tab active" data-crop="corn">Corn</button>
+                                    <button class="crop-tab" data-crop="wheat">Wheat</button>
+                                    <button class="crop-tab" data-crop="soybean">Soybean</button>
+                                    <button class="crop-tab" data-crop="cover">Cover Crops</button>
+                                </div>
+                                
+                                <div class="crop-guide-content" id="crop-guide-content">
+                                    <div class="crop-guide active" id="corn-guide">
+                                        <div class="crop-info-grid">
+                                            <div class="crop-info-item">
+                                                <h3>Optimal Soil Conditions</h3>
+                                                <p>Soil temperature above 50°F for germination</p>
+                                            </div>
+                                            <div class="crop-info-item">
+                                                <h3>Ideal Temperature</h3>
+                                                <p>60-80°F during growing season</p>
+                                            </div>
+                                            <div class="crop-info-item">
+                                                <h3>Planting Depth</h3>
+                                                <p>1.5-2 inches deep</p>
+                                            </div>
+                                            <div class="crop-info-item">
+                                                <h3>Row Spacing</h3>
+                                                <p>30 inches between rows</p>
+                                            </div>
+                                            <div class="crop-info-item">
+                                                <h3>Days to Maturity</h3>
+                                                <p>90-120 days depending on variety</p>
+                                            </div>
+                                            <div class="crop-info-item">
+                                                <h3>Notes</h3>
+                                                <p>Requires well-drained soil and consistent moisture during pollination</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Harvesting Page -->
+                <div class="page hidden" id="harvesting-page">
+                    <h2 class="page-title">Harvesting Status</h2>
+                    
+
+                    <!-- Crop Yield Status -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Crop Yield Status</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="crop-yields-container" id="crop-yields-container">
+                                <div class="crop-yield-grid">
+                                    <div class="crop-yield-item">
+                                        <div class="crop-yield-header">
+                                            <div class="crop-icon">
+                                                <i class="ri-leaf-line"></i>
+                                            </div>
+                                            <div class="crop-info">
+                                                <h3>Corn</h3>
+                                                <div class="crop-status success">Ready for Harvest</div>
+                                            </div>
+                                        </div>
+                                        <div class="crop-yield-progress">
+                                            <div class="progress-header">
+                                                <span>Maturity Progress</span>
+                                                <span>95%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill bg-success" style="width: 95%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="crop-yield-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Expected Yield:</span>
+                                                <span class="detail-value">175 bu/acre</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Optimal Window:</span>
+                                                <span class="detail-value">Sept 15-30</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="crop-yield-item">
+                                        <div class="crop-yield-header">
+                                            <div class="crop-icon">
+                                                <i class="ri-plant-line"></i>
+                                            </div>
+                                            <div class="crop-info">
+                                                <h3>Soybeans</h3>
+                                                <div class="crop-status warning">Approaching Maturity</div>
+                                            </div>
+                                        </div>
+                                        <div class="crop-yield-progress">
+                                            <div class="progress-header">
+                                                <span>Maturity Progress</span>
+                                                <span>80%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill bg-warning" style="width: 80%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="crop-yield-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Expected Yield:</span>
+                                                <span class="detail-value">52 bu/acre</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Optimal Window:</span>
+                                                <span class="detail-value">Oct 1-15</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Equipment Status -->
+                    <div class="card mt-lg">
+                        <div class="card-header">
+                            <h2 class="card-title">Equipment Status</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="equipment-status-container" id="equipment-status-container">
+                                <div class="equipment-status-list">
+                                    <div class="equipment-status-item">
+                                        <div class="equipment-header">
+                                            <h3>Combine Harvester</h3>
+                                            <span class="equipment-status success">Ready</span>
+                                        </div>
+                                        <div class="equipment-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Last Maintenance:</span>
+                                                <span class="detail-value">Sept 1, 2023</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Next Service:</span>
+                                                <span class="detail-value">Oct 30, 2023</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="equipment-status-item">
+                                        <div class="equipment-header">
+                                            <h3>Grain Trucks (3)</h3>
+                                            <span class="equipment-status success">Ready</span>
+                                        </div>
+                                        <div class="equipment-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Last Maintenance:</span>
+                                                <span class="detail-value">Aug 15, 2023</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Next Service:</span>
+                                                <span class="detail-value">Oct 15, 2023</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="equipment-status-item">
+                                        <div class="equipment-header">
+                                            <h3>Grain Dryer</h3>
+                                            <span class="equipment-status warning">Maintenance Required</span>
+                                        </div>
+                                        <div class="equipment-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">Last Maintenance:</span>
+                                                <span class="detail-value">Nov 20, 2022</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">Next Service:</span>
+                                                <span class="detail-value">Scheduled for Sept 20, 2023</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="copyright">
+                        &copy; 2023 Farm Weather Forecast. All rights reserved.
+                    </div>
+                    <div class="footer-links">
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- Modals -->
+        <div class="modal" id="add-activity-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Farming Activity</h2>
+                    <button class="btn-icon modal-close">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-activity-form">
+                        <div class="form-group">
+                            <label for="activity-title">Activity Title</label>
+                            <input type="text" id="activity-title" required placeholder="e.g. Corn Harvesting">
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-type">Activity Type</label>
+                            <select id="activity-type" required>
+                                <option value="">Select activity type</option>
+                                <option value="planting">Planting</option>
+                                <option value="harvesting">Harvesting</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="fertilizing">Fertilizing</option>
+                                <option value="irrigation">Irrigation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-status">Status</label>
+                            <select id="activity-status" required>
+                                <option value="planned">Planned</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="activity-start-date">Start Date</label>
+                                <input type="date" id="activity-start-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="activity-end-date">End Date</label>
+                                <input type="date" id="activity-end-date" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-notes">Notes (Optional)</label>
+                            <input type="text" id="activity-notes" placeholder="Any additional notes...">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Add Activity</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="utils.js"></script>
+    <script src="weather.js"></script>
+    <script src="soil.js"></script>
+    <script src="activities.js"></script>
+    <script src="calendar.js"></script>
+    <script src="map.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
